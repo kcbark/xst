@@ -1,4 +1,4 @@
-#define histsize 2000
+#define histsize 8192
 /* ref: http://freedesktop.org/software/fontconfig/fontconfig-user.html */
 static char *font = "Liberation Mono:pixelsize=12:antialias=true:autohint=true;";
 
@@ -121,6 +121,7 @@ static MouseKey mkeys[] = {
 
 /* Internal keyboard shortcuts. */
 #define MODKEY Mod1Mask
+#define MOD4   Mod4Mask
 
 static Shortcut shortcuts[] = {
 	/* mask                 keysym          function        argument */
@@ -133,8 +134,8 @@ static Shortcut shortcuts[] = {
 	{ MODKEY|ShiftMask,     XK_Home,        xzoomreset,     {.f =  0} },
 	{ ShiftMask,            XK_Insert,      selpaste,       {.i =  0} },
 	{ MODKEY|ShiftMask,     XK_Insert,      clippaste,      {.i =  0} },
-	{ MODKEY|ShiftMask,     XK_C,           clipcopy,       {.i =  0} },
-	{ MODKEY|ShiftMask,     XK_V,           clippaste,      {.i =  0} },
+	{ MOD4,     XK_c,           clipcopy,       {.i =  0} },
+	{ MOD4,     XK_v,           clippaste,      {.i =  0} },
 	{ MODKEY,               XK_Num_Lock,    numlock,        {.i =  0} },
 	{ MODKEY,               'u',            externalpipe,   {.v = "xurls | eval dmenu $(dmenu_options) | xargs -r $BROWSER" } },
 	{ ShiftMask,            XK_Page_Up,     kscrollup,      {.i = -1} },
