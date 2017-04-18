@@ -1,4 +1,14 @@
+<<<<<<< HEAD
 #define histsize 8192
+=======
+/* todo: xrdb histsize, cols, rows, bellvolume */
+
+#define histsize 2000
+
+static unsigned int cols = 80;
+static unsigned int rows = 24;
+
+>>>>>>> a32b4452762af7d744af711780277a6002617eec
 /* ref: http://freedesktop.org/software/fontconfig/fontconfig-user.html */
 static char *font = "Liberation Mono:pixelsize=12:antialias=true:autohint=true;";
 
@@ -21,12 +31,6 @@ static char worddelimiters[] = " ";
 
 /* alt screens */
 static int allowaltscreen = 1;
-
-/* blinking timeout for terminal blinking (0 disables) */
-static unsigned int blinktimeout = 800;
-
-/* thickness of underline and bar cursors */
-static unsigned int cursorthickness = 2;
 
 /* bell volume. Value between -100 and 100. (0 disables) */
 static int bellvolume = 100;
@@ -95,14 +99,29 @@ static unsigned int defaultrcs = 257;
 /* 2 4 6 7: █ _ | ☃ */
 static unsigned int cursorshape = 2;
 
+/* 0: normal blinking
+ * 1: leave cursor border and blink with cursor's background */
+static unsigned int cursorblinkstyle = 0;
+
+/* 0: cursor blinks with a constant interval
+ * 1: blinking cycle resets on key input */
+static unsigned int cursorblinkontype = 1;
+
+/* thickness of underline and bar cursors */
+static unsigned int cursorthickness = 2;
+
+/* blinking timeout for terminal and cursor blinking (0 disables) */
+static unsigned int blinktimeout = 800;
+
 /* mouse (again colors reference colorname indexes) */
 static unsigned int mouseshape = XC_xterm;
 static unsigned int mousefg = 7;
 static unsigned int mousebg = 0;
 
-/* Colors used when the specific fg == defaultfg. */
-static unsigned int defaultitalic = 11;
-static unsigned int defaultunderline = 7;
+/* Color used to display font attributes when fontconfig selected a font which
+ * doesn't match the ones requested.
+ */
+static unsigned int defaultattr = 11;
 
 
 /* Internal mouse shortcuts. */
@@ -137,6 +156,7 @@ static Shortcut shortcuts[] = {
 	{ MOD4,     XK_c,           clipcopy,       {.i =  0} },
 	{ MOD4,     XK_v,           clippaste,      {.i =  0} },
 	{ MODKEY,               XK_Num_Lock,    numlock,        {.i =  0} },
+  { MODKEY,               XK_Control_L,   iso14755,       {.i =  0} },
 	{ MODKEY,               'u',            externalpipe,   {.v = "xurls | eval dmenu $(dmenu_options) | xargs -r $BROWSER" } },
 	{ ShiftMask,            XK_Page_Up,     kscrollup,      {.i = -1} },
 	{ ShiftMask,            XK_Page_Down,   kscrolldown,    {.i = -1} },
@@ -224,7 +244,7 @@ static Key key[] = {
 	{ XK_KP_Delete,     ShiftMask,      "\033[2K",      -1,    0,    0},
 	{ XK_KP_Delete,     ShiftMask,      "\033[3;2~",    +1,    0,    0},
 	{ XK_KP_Delete,     XK_ANY_MOD,     "\033[P",       -1,    0,    0},
-	{ XK_KP_Delete,     XK_ANY_MOD,     "\033[3~",      +1,    0,    0},
+	{ XK_KP_Delete,     XK_ANY_MOD,     "\177",         +1,    0,    0},
 	{ XK_KP_Multiply,   XK_ANY_MOD,     "\033Oj",       +2,    0,    0},
 	{ XK_KP_Add,        XK_ANY_MOD,     "\033Ok",       +2,    0,    0},
 	{ XK_KP_Enter,      XK_ANY_MOD,     "\033OM",       +2,    0,    0},
@@ -244,23 +264,39 @@ static Key key[] = {
 	{ XK_KP_8,          XK_ANY_MOD,     "\033Ox",       +2,    0,    0},
 	{ XK_KP_9,          XK_ANY_MOD,     "\033Oy",       +2,    0,    0},
 	{ XK_Up,            ShiftMask,      "\033[1;2A",     0,    0,    0},
-	{ XK_Up,            ControlMask,    "\033[1;5A",     0,    0,    0},
 	{ XK_Up,            Mod1Mask,       "\033[1;3A",     0,    0,    0},
+	{ XK_Up,         ShiftMask|Mod1Mask,"\033[1;4A",     0,    0,    0},
+	{ XK_Up,            ControlMask,    "\033[1;5A",     0,    0,    0},
+	{ XK_Up,      ShiftMask|ControlMask,"\033[1;6A",     0,    0,    0},
+	{ XK_Up,       ControlMask|Mod1Mask,"\033[1;7A",     0,    0,    0},
+	{ XK_Up,ShiftMask|ControlMask|Mod1Mask,"\033[1;8A",  0,    0,    0},
 	{ XK_Up,            XK_ANY_MOD,     "\033[A",        0,   -1,    0},
 	{ XK_Up,            XK_ANY_MOD,     "\033OA",        0,   +1,    0},
 	{ XK_Down,          ShiftMask,      "\033[1;2B",     0,    0,    0},
-	{ XK_Down,          ControlMask,    "\033[1;5B",     0,    0,    0},
 	{ XK_Down,          Mod1Mask,       "\033[1;3B",     0,    0,    0},
+	{ XK_Down,       ShiftMask|Mod1Mask,"\033[1;4B",     0,    0,    0},
+	{ XK_Down,          ControlMask,    "\033[1;5B",     0,    0,    0},
+	{ XK_Down,    ShiftMask|ControlMask,"\033[1;6B",     0,    0,    0},
+	{ XK_Down,     ControlMask|Mod1Mask,"\033[1;7B",     0,    0,    0},
+	{ XK_Down,ShiftMask|ControlMask|Mod1Mask,"\033[1;8B",0,    0,    0},
 	{ XK_Down,          XK_ANY_MOD,     "\033[B",        0,   -1,    0},
 	{ XK_Down,          XK_ANY_MOD,     "\033OB",        0,   +1,    0},
 	{ XK_Left,          ShiftMask,      "\033[1;2D",     0,    0,    0},
-	{ XK_Left,          ControlMask,    "\033[1;5D",     0,    0,    0},
 	{ XK_Left,          Mod1Mask,       "\033[1;3D",     0,    0,    0},
+	{ XK_Left,       ShiftMask|Mod1Mask,"\033[1;4D",     0,    0,    0},
+	{ XK_Left,          ControlMask,    "\033[1;5D",     0,    0,    0},
+	{ XK_Left,    ShiftMask|ControlMask,"\033[1;6D",     0,    0,    0},
+	{ XK_Left,     ControlMask|Mod1Mask,"\033[1;7D",     0,    0,    0},
+	{ XK_Left,ShiftMask|ControlMask|Mod1Mask,"\033[1;8D",0,    0,    0},
 	{ XK_Left,          XK_ANY_MOD,     "\033[D",        0,   -1,    0},
 	{ XK_Left,          XK_ANY_MOD,     "\033OD",        0,   +1,    0},
 	{ XK_Right,         ShiftMask,      "\033[1;2C",     0,    0,    0},
-	{ XK_Right,         ControlMask,    "\033[1;5C",     0,    0,    0},
 	{ XK_Right,         Mod1Mask,       "\033[1;3C",     0,    0,    0},
+	{ XK_Right,      ShiftMask|Mod1Mask,"\033[1;4C",     0,    0,    0},
+	{ XK_Right,         ControlMask,    "\033[1;5C",     0,    0,    0},
+	{ XK_Right,   ShiftMask|ControlMask,"\033[1;6C",     0,    0,    0},
+	{ XK_Right,    ControlMask|Mod1Mask,"\033[1;7C",     0,    0,    0},
+	{ XK_Right,ShiftMask|ControlMask|Mod1Mask,"\033[1;8C",0,   0,    0},
 	{ XK_Right,         XK_ANY_MOD,     "\033[C",        0,   -1,    0},
 	{ XK_Right,         XK_ANY_MOD,     "\033OC",        0,   +1,    0},
 	{ XK_ISO_Left_Tab,  ShiftMask,      "\033[Z",        0,    0,    0},
@@ -279,8 +315,7 @@ static Key key[] = {
 	{ XK_Delete,        ShiftMask,      "\033[2K",      -1,    0,    0},
 	{ XK_Delete,        ShiftMask,      "\033[3;2~",    +1,    0,    0},
 	{ XK_Delete,        XK_ANY_MOD,     "\033[P",       -1,    0,    0},
-	{ XK_Delete,        XK_ANY_MOD,     "\033[3~",      +1,    0,    0},
-	{ XK_BackSpace,     XK_NO_MOD,      "\177",          0,    0,    0},
+	{ XK_Delete,        XK_ANY_MOD,     "\177",         +1,    0,    0},
 	{ XK_BackSpace,     Mod1Mask,       "\033\177",      0,    0,    0},
 	{ XK_Home,          ShiftMask,      "\033[2J",       0,   -1,    0},
 	{ XK_Home,          ShiftMask,      "\033[1;2H",     0,   +1,    0},
